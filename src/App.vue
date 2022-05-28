@@ -1,30 +1,57 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <div class="app">
+    <form>
+      <h4>Creating posts</h4>
+      <input class="post_input" type="text" placeholder="title" v-bind:value="title">
+      <input class="post_input" type="text" placeholder="description" v-bind:value="body">
+      <button @click="createPost">Create post</button>
+    </form>
+    <div class="post" v-for="post in posts">
+      <div><strong>{{post.title}}: </strong>{{post.body}}</div>
+    </div>
+  </div>
 </template>
 
+<script>
+export default {
+  name: "App",
+  data(){
+    return {
+      posts: [
+        {id: 1, title: 'description1', body: 'Post number 1'},
+        {id: 2, title: 'description2', body: 'Post number 2'},
+        {id: 3, title: 'description3', body: 'Post number 3'},
+      ],
+      title: '',
+      body: '',
+    }
+  },
+  methods:{
+    createPost(){
+
+    }
+  }
+}
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-
-nav {
-  padding: 30px;
+.app{
+  padding: 20px;
 }
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+.post{
+  padding: 15px;
+  border: 3px solid teal;
+  margin-top: 10px;
 }
-
-nav a.router-link-exact-active {
-  color: #42b983;
+.post_input{
+  width: 100%;
+  padding: 10px 15px;
+  margin-top: 10px;
+  border: 1px solid teal;
 }
 </style>
