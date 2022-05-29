@@ -1,19 +1,18 @@
 <template>
   <div class="app">
-    <form>
-      <h4>Creating posts</h4>
-      <input class="post_input" type="text" placeholder="title" v-bind:value="title">
-      <input class="post_input" type="text" placeholder="description" v-bind:value="body">
-      <button @click="createPost">Create post</button>
-    </form>
-    <div class="post" v-for="post in posts">
-      <div><strong>{{post.title}}: </strong>{{post.body}}</div>
-    </div>
+    <PostForm/>
+    <PostList vbi/>
   </div>
 </template>
 
 <script>
+import PostForm from "@/components/PostForm";
+import PostList from "@/components/PostList";
 export default {
+  components: {
+    PostForm,
+    PostList
+  },
   name: "App",
   data(){
     return {
@@ -27,9 +26,16 @@ export default {
     }
   },
   methods:{
-    createPost(){
-
-    }
+    createPost(event){
+      const newPost = {
+        id: Date.now(),
+        title: this.title,
+        body : this.body,
+      }
+      this.posts.push(newPost)
+      this.title = ''
+      this.body = ''
+    },
   }
 }
 </script>
@@ -42,16 +48,5 @@ export default {
 }
 .app{
   padding: 20px;
-}
-.post{
-  padding: 15px;
-  border: 3px solid teal;
-  margin-top: 10px;
-}
-.post_input{
-  width: 100%;
-  padding: 10px 15px;
-  margin-top: 10px;
-  border: 1px solid teal;
 }
 </style>
