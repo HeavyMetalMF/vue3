@@ -2,10 +2,10 @@
   <div>
     {{posts}}
   </div>
-<!--  <div class="post" v-for="post in posts">-->
-<!--    <div><strong>Name: </strong>{{post.title}}</div>-->
-<!--    <div><strong>Description: </strong>{{post.body}}</div>-->
-<!--  </div>-->
+  <div class="post" v-for="post in posts">
+    <div><strong>Name: </strong>{{post.title}}</div>
+    <div><strong>Description: </strong>{{post.body}}</div>
+  </div>
 </template>
 
 <script>
