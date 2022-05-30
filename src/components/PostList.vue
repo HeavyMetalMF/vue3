@@ -1,29 +1,27 @@
 <template>
-  <div>
-    {{posts}}
+  <div v-if="posts.length > 0">
+    <h3>List of users</h3>
+    <PostItem v-for="post in posts" v-bind:post="post" v-bind:key="post.id" @remove="$emit('remove', post)" />
   </div>
-  <div class="post" v-for="post in posts">
-    <div><strong>Name: </strong>{{post.title}}</div>
-    <div><strong>Description: </strong>{{post.body}}</div>
-  </div>
+  <h2 v-else style="color: red">Empty</h2>
 </template>
 
 <script>
+import PostItem from "@/components/PostItem";
 export default {
+  components: {
+    PostItem
+  },
   name: "PostList",
   props: {
     posts: {
       type: Array,
-      required: true
+      required: true,
     }
   }
 }
 </script>
 
 <style scoped>
-.post{
-  padding: 15px;
-  border: 3px solid teal;
-  margin-top: 10px;
-}
+
 </style>
