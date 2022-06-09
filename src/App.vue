@@ -2,13 +2,17 @@
   <div class="app">
     <div class="app__btns">
       <Button @click="showDialog">Создать пост</Button>
+      <Input type="text" placeholder="search posts" v-model="searchPosts"/>
       <MySelect v-model="selectedSort" :options="sortOptions"/>
     </div>
     <MyDialog v-model:show="dialogVisible" >
       <PostForm @create="createPost" title="props.title"/>
     </MyDialog>
-    <PostList v-if="!isLoading" v-bind:posts="sortedPosts" @remove="removePost" />
+    <PostList v-if="!isLoading" v-bind:posts="searchedAndSortedPosts" @remove="removePost" />
     <div v-else >LOADING............</div>
+    <div class="page__wrapper">
+      <div :class="{'current__page': page === pageNumber}" class="page" v-for="pageNumber in totalPage" :key="pageNumber" @click="changePage(pageNumber)"> {{pageNumber}} </div>
+    </div>
     <Button @click="fetchPosts"> asdsadas</Button>
   </div>
 </template>
@@ -36,7 +40,11 @@ export default {
       sortOptions: [
         {value: 'title', name: 'По названию'},
         {value: 'body', name: 'По содержимому'},
-      ]
+      ],
+      searchPosts: '',
+      page: 1,
+      limit: 5,
+      totalPage: 0,
     }
   },
   methods:{
@@ -53,7 +61,13 @@ export default {
     async fetchPosts(){
        try {
          this.isLoading = true;
-         const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=10');
+         const response = await axios.get('https://jsonplaceholder.typicode.com/posts?', {
+           params: {
+             _page: this.page,
+             _limit: this.limit
+           }
+         });
+         this.totalPage = Math.ceil(response.headers['x-total-count'] / this.limit);
          this.posts = response.data;
          console.log(response)
        }catch (e) {
@@ -61,6 +75,9 @@ export default {
        }finally {
          this.isLoading = false;
        }
+    },
+    changePage(pageNumber) {
+       this.page = pageNumber;
     }
   },
   mounted() {
@@ -68,16 +85,16 @@ export default {
   },
   computed: {
     sortedPosts(newValue) {
-      return [...this.posts].sort((a, b) => a[this.selectedSort]?.localeCompare(b[this.selectedSort]))
+      return [...this.posts].sort((a, b) => a[this.selectedSort]?.localeCompare(b[this.selectedSort]));
+    },
+    searchedAndSortedPosts() {
+      return this.sortedPosts.filter(post => post.title.includes(this.searchPosts));
     }
   },
   watch: {
-    // selectedSort(newValue) {
-    //   this.posts.sort((a, b) => {
-    //     return a[newValue].localeCompare(b[newValue])
-    //   })
-    //   console.log(this.posts)
-    // },
+    page() {
+      this.fetchPosts();
+    }
   }
 }
 </script>
@@ -94,5 +111,17 @@ export default {
 .app__btns{
   display: flex;
   justify-content:space-between;
+}
+.page__wrapper{
+  display: flex;
+  margin-top: 15px;
+}
+.page{
+  border: 1px solid black;
+  margin-right: 5px;
+  padding: 5px;
+}
+.current__page{
+  border: 2px solid teal;
 }
 </style>
