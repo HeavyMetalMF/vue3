@@ -1,10 +1,11 @@
 <template>
   <div>
     <router-link to="/uuu">asdasd</router-link>
+    <h1>STORE POSTS</h1>
     <div class="app__btns">
       <Button @click="showDialog">Создать пост</Button>
-      <Input type="text" placeholder="search posts" v-model="searchPosts" v-focus/>
-      <MySelect v-model="selectedSort" :options="sortOptions"/>
+      <Input type="text" placeholder="search posts" :modelValue="searchPosts" @update:modelValue="setSearchPosts" v-focus/>
+      <MySelect :modelValue="selectedSort" @update:modelValue="setSelectedSort" :options="sortOptions"/>
     </div>
     <MyDialog v-model:show="dialogVisible" >
       <PostForm @create="createPost" title="props.title"/>
@@ -21,9 +22,9 @@
 <script>
 import PostForm from "@/components/PostForm";
 import PostList from "@/components/PostList";
-import axios from "axios";
 import Button from "@/components/UI/Button";
 import MySelect from "@/components/UI/MySelect";
+import {mapState, mapActions, mapGetters, mapMutations} from 'vuex';
 export default {
   components: {
     MySelect,
@@ -34,48 +35,27 @@ export default {
   // name: "App",
   data(){
     return {
-      posts: [],
       dialogVisible: false,
-      isLoading: false,
-      selectedSort: '',
-      sortOptions: [
-        {value: 'title', name: 'По названию'},
-        {value: 'body', name: 'По содержимому'},
-      ],
-      searchPosts: '',
-      page: 1,
-      limit: 5,
-      totalPage: 0,
     }
   },
   methods:{
+    ...mapMutations({
+      setPage: 'post/setPage',
+      setSearchPosts: 'post/setSearchPosts',
+      setSelectedSort: 'post/setSelectedSort'
+    }),
+    ...mapActions({
+      fetchPosts: 'post/fetchPosts',
+    }),
     createPost(post){
       this.posts.push(post);
       this.dialogVisible = false;
     },
     removePost(post){
-      this.posts = this.posts.filter(p => p.id !== post.id)
+      this.posts = this.posts.filter(p => p.id !== post.id);
     },
     showDialog(){
       this.dialogVisible = true;
-    },
-    async fetchPosts(){
-      try {
-        this.isLoading = true;
-        const response = await axios.get('https://jsonplaceholder.typicode.com/posts?', {
-          params: {
-            _page: this.page,
-            _limit: this.limit
-          }
-        });
-        this.totalPage = Math.ceil(response.headers['x-total-count'] / this.limit);
-        this.posts = response.data;
-        console.log(response)
-      }catch (e) {
-        alert('Error')
-      }finally {
-        this.isLoading = false;
-      }
     },
     changePage(pageNumber) {
       this.page = pageNumber;
@@ -85,12 +65,20 @@ export default {
     this.fetchPosts();
   },
   computed: {
-    sortedPosts(newValue) {
-      return [...this.posts].sort((a, b) => a[this.selectedSort]?.localeCompare(b[this.selectedSort]));
-    },
-    searchedAndSortedPosts() {
-      return this.sortedPosts.filter(post => post.title.includes(this.searchPosts));
-    }
+    ...mapState({
+      posts: state => state.post.posts,
+      isLoading: state => state.post.isLoading,
+      selectedSort: state => state.post.selectedSort,
+      sortOptions: state => state.post.sortOptions,
+      searchPosts: state => state.post.searchPosts,
+      page: state => state.post.page,
+      limit: state => state.post.limit,
+      totalPage: state => state.post.totalPage,
+    }),
+    ...mapGetters({
+      sortedPosts: 'post/sortedPosts',
+      searchedAndSortedPosts: 'post/searchedAndSortedPosts'
+    }),
   },
   watch: {
     page() {

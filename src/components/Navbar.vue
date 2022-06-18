@@ -4,6 +4,7 @@
     <div class="navbar__btns">
       <Button @click="$router.push('/posts')">POSTS</Button>
       <Button @click="$router.push('/about')">ABOUT</Button>
+      <Button @click="$router.push('/store')">STORE POSTS</Button>
     </div>
   </div>
 </template>
@@ -13,7 +14,7 @@ import Button from "@/components/UI/Button";
 
 export default {
   name: "Navbar",
-  components: {Button}
+  components: {Button},
 
 }
 </script>
